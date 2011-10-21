@@ -3,7 +3,8 @@ object Main extends App {
   
   val xml = <ObjectEvent
       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-      xsi:type="ObjectEventType">
+      xmlns:epcis="urn:epcglobal:epcis:xsd:1"
+      xsi:type="epcis:ObjectEventType">
     <eventTime>2010-01-01</eventTime>
     <eventTimeZoneOffset>Z</eventTimeZoneOffset>
     <epcList/>
