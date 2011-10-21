@@ -1,1 +1,1 @@
-addSbtPlugin("org.scalaxb" % "sbt-scalaxb" % "0.6.5")
+addSbtPlugin("org.scalaxb" % "sbt-scalaxb" % "0.6.6-SNAPSHOT")
