@@ -70,12 +70,15 @@ object Main extends App {
    val xmlNodeSeq = toXML2(evtType)
    val xmlStr = xmlNodeSeq.toString
    
+   println("---xmlStr---")
    println(xmlStr)
    
    val retNodeSeq = scala.xml.XML.loadString(xmlStr)
    val retObj = scalaxb.fromXML[EPCISEventType](retNodeSeq)
    val newNodeSeq = toXML2(retObj)
    val newXmlStr = newNodeSeq.toString
-
+   
+   println("---newXmlStr---")
    val s = newXmlStr  
+   println(newXmlStr)
 }
