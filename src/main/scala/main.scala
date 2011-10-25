@@ -1,21 +1,7 @@
 object Main extends App {
   import epcis._
-  
-  val xml = <ObjectEvent
-      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-      xmlns:epcis="urn:epcglobal:epcis:xsd:1"
-      xsi:type="epcis:ObjectEventType">
-    <eventTime>2010-01-01</eventTime>
-    <eventTimeZoneOffset>Z</eventTimeZoneOffset>
-    <epcList/>
-    <action>ADD</action>
-  </ObjectEvent>
-  
-  val normalizedEvent: EPCISEventType = scalaxb.fromXML[EPCISEventType](xml)
-  println(normalizedEvent.toString)
-  
-  val temp = scalaxb.toXML(normalizedEvent, None, "ObjectType", defaultScope)
-  println(temp)
+  import scalaxb._
+  import scala.xml.{NodeSeq, XML}
   
   val commissionXml = <epcis:EPCISDocument xmlns:epcis="urn:epcglobal:epcis:xsd:1"
         xmlns:core="urn:epcglobal:hls:1"
@@ -58,27 +44,74 @@ object Main extends App {
          </EPCISBody>
        </epcis:EPCISDocument>
   
-   def toXML2(event: EPCISEventType): scala.xml.NodeSeq = {
+  example1
+  testEventSequence
+  
+  def testEventSequence {
+    println("===testEventSequence===")
+    
+    val fixedScope = toScope(
+       Some("epcis") -> "urn:epcglobal:epcis:xsd:1",
+       Some("xs") -> "http://www.w3.org/2001/XMLSchema",
+       Some("xsi") -> "http://www.w3.org/2001/XMLSchema-instance")
+       
+    def toXML3(event: EPCISDocumentType): NodeSeq = {
+     toXML[EPCISDocumentType](event, Some("urn:epcglobal:epcis:xsd:1"), Some("EPCISDocument"), defaultScope)
+    }
+
+    def toXML2(event: EPCISEventType): NodeSeq = {
+     toXML[EPCISEventType](event, Some("urn:epcglobal:epcis:xsd:1"), Some("EventObject"), fixedScope)
+    }
+    val xmlObj = fromXML[EPCISDocumentType](commissionXml)
+    val evtList = xmlObj.EPCISBody.EventList.get
+    val evtListType = evtList.eventlisttypeoption
+    val head = evtListType.head
+    val evt = head.value
+    val evtType = evt.asInstanceOf[EPCISEventType]
+    val xmlNodeSeq = toXML2(evtType)
+    val xmlStr = xmlNodeSeq.toString
+
+    val retNodeSeq = XML.loadString(xmlStr)
+    val retObj = fromXML[EPCISEventType](retNodeSeq)
+
+    val newNodeSeq = toXML2(retObj)
+    val dr = DataRecord(None, Some("ObjectEvent"), None, None, retObj)
+    val theNewEvtList = EventListType(dr)
+    val resultingObj = xmlObj.copy(EPCISBody = xmlObj.EPCISBody.copy(EventList = Some(theNewEvtList)))
+    val docNodeSeq = toXML3(resultingObj)
+    val docXml = docNodeSeq.toString
+    println("---docXml---")
+    println(docXml)
+    
+    val newXmlStr = newNodeSeq.toString
+    //try to read in the document to see if it is valid as well
+    val newDocObj = fromXML[EPCISDocumentType](XML.loadString(docXml))
+    val s = newXmlStr
+  }
+  
+  def example1 {
+    def toXML2(event: EPCISEventType): scala.xml.NodeSeq = {
      scalaxb.toXML[EPCISEventType](event, Some("urn:epcglobal:epcis:xsd:1"), Some("EventObject"), defaultScope)
-   }
-   val xmlObj = scalaxb.fromXML[EPCISDocumentType](commissionXml)
-   val evtList = xmlObj.EPCISBody.EventList.get
-   val evtListType = evtList.eventlisttypeoption
-   val head = evtListType.head
-   val evt = head.value
-   val evtType = evt.asInstanceOf[EPCISEventType]
-   val xmlNodeSeq = toXML2(evtType)
-   val xmlStr = xmlNodeSeq.toString
-   
-   println("---xmlStr---")
-   println(xmlStr)
-   
-   val retNodeSeq = scala.xml.XML.loadString(xmlStr)
-   val retObj = scalaxb.fromXML[EPCISEventType](retNodeSeq)
-   val newNodeSeq = toXML2(retObj)
-   val newXmlStr = newNodeSeq.toString
-   
-   println("---newXmlStr---")
-   val s = newXmlStr  
-   println(newXmlStr)
+    }
+    val xmlObj = scalaxb.fromXML[EPCISDocumentType](commissionXml)
+    val evtList = xmlObj.EPCISBody.EventList.get
+    val evtListType = evtList.eventlisttypeoption
+    val head = evtListType.head
+    val evt = head.value
+    val evtType = evt.asInstanceOf[EPCISEventType]
+    val xmlNodeSeq = toXML2(evtType)
+    val xmlStr = xmlNodeSeq.toString
+
+    println("---xmlStr---")
+    println(xmlStr)
+
+    val retNodeSeq = scala.xml.XML.loadString(xmlStr)
+    val retObj = scalaxb.fromXML[EPCISEventType](retNodeSeq)
+    val newNodeSeq = toXML2(retObj)
+    val newXmlStr = newNodeSeq.toString
+
+    println("---newXmlStr---")
+    val s = newXmlStr  
+    println(newXmlStr)
+  }
 }
