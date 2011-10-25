@@ -44,8 +44,9 @@ object Main extends App {
          </EPCISBody>
        </epcis:EPCISDocument>
   
-  example1
-  testEventSequence
+  // example1
+  example2
+  // testEventSequence
   
   def testEventSequence {
     println("===testEventSequence===")
@@ -113,5 +114,51 @@ object Main extends App {
     println("---newXmlStr---")
     val s = newXmlStr  
     println(newXmlStr)
+  }
+  
+  def example2 {
+    val voidXml = <epcis:EPCISDocument creationDate="2010-04-01T14:11:23Z" schemaVersion="1" xmlns:epcis="urn:epcglobal:epcis:xsd:1" xmlns:tnt="someNamespace" xmlns:core="urn:epcglobal:hls:1">
+      <EPCISBody>
+        <EventList>
+          <ObjectEvent>
+            <eventTime>2011-10-04T09:31:03.894-06:00</eventTime>
+            <eventTimeZoneOffset>-06:00</eventTimeZoneOffset>
+            <baseExtension>
+              <voidEvent>4LiJJVevyKcYxvzs_FCJ-w</voidEvent>
+            </baseExtension>
+            <epcList>
+              <epc>urn:epc:id:sgtin:0111222.999888.001</epc><epc>urn:epc:id:sgtin:0111222.999888.0010</epc><epc>urn:epc:id:sgtin:0111222.999888.0011</epc><epc>urn:epc:id:sgtin:0111222.999888.0012</epc><epc>urn:epc:id:sgtin:0111222.999888.002</epc><epc>urn:epc:id:sgtin:0111222.999888.003</epc><epc>urn:epc:id:sgtin:0111222.999888.004</epc><epc>urn:epc:id:sgtin:0111222.999888.005</epc><epc>urn:epc:id:sgtin:0111222.999888.006</epc><epc>urn:epc:id:sgtin:0111222.999888.007</epc><epc>urn:epc:id:sgtin:0111222.999888.008</epc><epc>urn:epc:id:sgtin:0111222.999888.009</epc>
+            </epcList>
+            <action>ADD</action>
+            <bizStep>urn:epcglobal:bizstep:commissioning</bizStep>
+            <disposition>urn:epcglobal:disp:active</disposition>
+            <readPoint>
+              <id>urn:epc:id:sgln:0111222.00001.0</id>
+            </readPoint>
+            <bizLocation>
+              <id>urn:epc:id:sgln:0111222.00001.0</id>
+            </bizLocation>
+            <core:lot>xxx-100</core:lot>
+            <core:expirationDate>2011-10-24T09:31:03.868-06:00</core:expirationDate>
+            <core:productCode>urn:epc:idpat:sgtin:0111222.999888.*</core:productCode>
+          </ObjectEvent>
+        </EventList>
+      </EPCISBody>
+    </epcis:EPCISDocument>
+            
+    val xmlObj = fromXML[EPCISDocumentType](voidXml)
+    val evtList = xmlObj.EPCISBody.EventList.get
+    val evtListType = evtList.eventlisttypeoption
+    val head = evtListType.head
+    val evt = head.value
+    val evtType = evt.asInstanceOf[EPCISEventType]
+    val baseExt = evtType.baseExtension.get
+    
+    println(baseExt.toString)
+    
+    baseExt.any.size match {
+      case 1 => 
+      case _ => sys.error("should be size 1") 
+    }
   }
 }
