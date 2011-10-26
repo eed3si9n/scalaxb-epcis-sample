@@ -124,7 +124,7 @@ object Main extends App {
             <eventTime>2011-10-04T09:31:03.894-06:00</eventTime>
             <eventTimeZoneOffset>-06:00</eventTimeZoneOffset>
             <baseExtension>
-              <voidEvent>4LiJJVevyKcYxvzs_FCJ-w</voidEvent>
+              <tnt:voidEvent>4LiJJVevyKcYxvzs_FCJ-w</tnt:voidEvent>
             </baseExtension>
             <epcList>
               <epc>urn:epc:id:sgtin:0111222.999888.001</epc><epc>urn:epc:id:sgtin:0111222.999888.0010</epc><epc>urn:epc:id:sgtin:0111222.999888.0011</epc><epc>urn:epc:id:sgtin:0111222.999888.0012</epc><epc>urn:epc:id:sgtin:0111222.999888.002</epc><epc>urn:epc:id:sgtin:0111222.999888.003</epc><epc>urn:epc:id:sgtin:0111222.999888.004</epc><epc>urn:epc:id:sgtin:0111222.999888.005</epc><epc>urn:epc:id:sgtin:0111222.999888.006</epc><epc>urn:epc:id:sgtin:0111222.999888.007</epc><epc>urn:epc:id:sgtin:0111222.999888.008</epc><epc>urn:epc:id:sgtin:0111222.999888.009</epc>
