@@ -45,8 +45,8 @@ object Main extends App {
        </epcis:EPCISDocument>
   
   // example1
-  example2
-  // testEventSequence
+  // example2
+  testEventSequence
   
   def testEventSequence {
     println("===testEventSequence===")
