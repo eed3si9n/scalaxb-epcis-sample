@@ -46,7 +46,46 @@ object Main extends App {
   
   // example1
   // example2
-  testEventSequence
+  testEventSequence2
+  
+  def testEventSequence2 {
+    println("===testEventSequence2===")
+    
+    def toXML2(event: EPCISEventType): NodeSeq = {
+      toXML[EPCISEventType](event, Some("urn:epcglobal:epcis:xsd:1"), Some("EventObject"), defaultScope)
+    }
+    val xmlObj = fromXML[EPCISDocumentType](commissionXml)
+    val evtList = xmlObj.EPCISBody.EventList.get
+    val evtListType = evtList.eventlisttypeoption
+    val head = evtListType.head
+    val evt = head.value
+    val evtType = evt.asInstanceOf[EPCISEventType]
+    val xmlNodeSeq = toXML2(evtType)
+    val xmlStr = xmlNodeSeq.toString
+    
+    println("--xmlStr--")
+    println(xmlStr)
+    
+    val retNodeSeq = XML.loadString(xmlStr)
+    val retObj = fromXML[EPCISEventType](retNodeSeq)
+
+    def translateToDataRec(evt:EPCISEventType) : DataRecord[Any] = {
+      evt match {
+        case e : ObjectEventType => DataRecord[ObjectEventType](e)
+        case e : AggregationEventType => DataRecord[AggregationEventType](e)
+        case e : TransactionEventType => DataRecord[TransactionEventType](e)
+        case e : QuantityEventType => DataRecord[QuantityEventType](e)
+      }
+    }
+
+    val event = translateToDataRec(retObj)
+    val theEvtList = Some(EventListType(event))
+    val body = EPCISBodyType(theEvtList, None, Nil, Map[String, scalaxb.DataRecord[Any]]())
+    val eventDoc = EPCISDocumentType(None, body, None, Nil, 1, retObj.eventTime, Map[String, scalaxb.DataRecord[Any]]())
+
+    val xml = toXML[EPCISDocumentType](eventDoc, Some("urn:epcglobal:epcis:xsd:1"), Some("EPCISDocument"), defaultScope)
+    println("xml ="+xml) 
+  }
   
   def testEventSequence {
     println("===testEventSequence===")
