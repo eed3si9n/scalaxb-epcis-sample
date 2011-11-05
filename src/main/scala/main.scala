@@ -2,6 +2,7 @@ object Main extends App {
   import epcis._
   import scalaxb._
   import scala.xml.{NodeSeq, XML}
+  import java.net.URI
   
   val commissionXml = <epcis:EPCISDocument xmlns:epcis="urn:epcglobal:epcis:xsd:1"
         xmlns:core="urn:epcglobal:hls:1"
@@ -48,6 +49,35 @@ object Main extends App {
   // example2
   testEventSequence2
   datarecordTest
+  testDefaultNamespace
+  
+  def testDefaultNamespace() {
+    val context = ContextParmsListType(Some(new URI("asdf")), Some(new URI("eere")))
+    val epcs :List[EPC] = Nil
+    val pedCheck = PedigreeCheckRequestType(context, epcs)
+
+    val xml = toXML[PedigreeCheckRequestType](pedCheck, Some("http://ghx.com/v1/tnt/pedigreeCheckRequest"), Some("EventSequenceRequest"), defaultScope)
+    val stringXml = xml.toString
+
+    //val requestXml2 = XML.loadString(stringXml)
+    val requestXml =
+      <ghx:EventSequenceRequest xmlns:ghx="http://ghx.com/v1/tnt/pedigreeCheckRequest"
+                      xmlns="http://ghx.com/v1/tnt/pedigreeCheckRequest"
+                      xmlns:epcis="urn:epcglobal:epcis:xsd:1">
+        <ContextParms>
+          <epcis:ContextBizStep>MyBizStep</epcis:ContextBizStep>
+          <epcis:ContextLocation>MyBizLoc</epcis:ContextLocation>
+        </ContextParms>
+      </ghx:EventSequenceRequest>
+
+
+    val xmlObj = fromXML[PedigreeCheckRequestType](requestXml)
+
+    val bizStepOption = xmlObj.ContextParms.ContextBizStep
+    // Assert.assertTrue(bizStepOption.isDefined)
+    // Assert.assertEquals("MyBizStep", bizStepOption.get+"")
+    //info("our obj="+xmlObj)
+  }  
   
   def datarecordTest {
     val scope = scalaxb.toScope(Some("xs") -> "http://www.w3.org/2001/XMLSchema",
