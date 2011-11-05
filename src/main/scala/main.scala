@@ -62,22 +62,22 @@ object Main extends App {
     //val requestXml2 = XML.loadString(stringXml)
     val requestXml =
       <ghx:EventSequenceRequest xmlns:ghx="http://ghx.com/v1/tnt/pedigreeCheckRequest"
-                      xmlns="http://ghx.com/v1/tnt/pedigreeCheckRequest"
                       xmlns:epcis="urn:epcglobal:epcis:xsd:1">
         <ContextParms>
-          <epcis:ContextBizStep>MyBizStep</epcis:ContextBizStep>
-          <epcis:ContextLocation>MyBizLoc</epcis:ContextLocation>
+          <ContextBizStep>MyBizStep</ContextBizStep>
+          <ContextLocation>MyBizLoc</ContextLocation>
         </ContextParms>
       </ghx:EventSequenceRequest>
-
-
+      
     val xmlObj = fromXML[PedigreeCheckRequestType](requestXml)
-
     val bizStepOption = xmlObj.ContextParms.ContextBizStep
-    // Assert.assertTrue(bizStepOption.isDefined)
-    // Assert.assertEquals("MyBizStep", bizStepOption.get+"")
-    //info("our obj="+xmlObj)
-  }  
+    bizStepOption match {
+      case Some(x) if x.toString == "MyBizStep" =>
+      case _ => error("match failure: " + bizStepOption.toString)
+    }
+    
+    println("our obj=" + xmlObj.toString)
+  }
   
   def datarecordTest {
     val scope = scalaxb.toScope(Some("xs") -> "http://www.w3.org/2001/XMLSchema",
