@@ -47,6 +47,19 @@ object Main extends App {
   // example1
   // example2
   testEventSequence2
+  datarecordTest
+  
+  def datarecordTest {
+    val scope = scalaxb.toScope(Some("xs") -> "http://www.w3.org/2001/XMLSchema",
+      Some("xsi") -> "http://www.w3.org/2001/XMLSchema-instance")
+    val subject = <core:gln xmlns:core="urn:epcglobal:hls:1">0111222123458</core:gln>
+    val r = scalaxb.fromXML[DataRecord[Any]](subject)
+    val document = scalaxb.toXML[scalaxb.DataRecord[Any]](r, r.namespace, r.key, scope, true)
+    document.toString match {
+      case """<core:gln xmlns:core="urn:epcglobal:hls:1">0111222123458</core:gln>""" =>
+      case x => error("match failed: " + x)
+    }
+  }
   
   def testEventSequence2 {
     println("===testEventSequence2===")
@@ -60,6 +73,19 @@ object Main extends App {
     val head = evtListType.head
     val evt = head.value
     val evtType = evt.asInstanceOf[EPCISEventType]
+    
+    println("--evt--")
+    println(evt.toString)
+    
+    evt match {
+      case e: ObjectEventType =>
+        val locationAny = e.bizLocation.get.any.head
+        println("--locationAny--")
+        println(locationAny.toString)
+        println(scalaxb.toXML[scalaxb.DataRecord[Any]](locationAny, locationAny.namespace, locationAny.key, defaultScope, true))
+      case _ =>
+    }
+    
     val xmlNodeSeq = toXML2(evtType)
     val xmlStr = xmlNodeSeq.toString
     
@@ -71,10 +97,10 @@ object Main extends App {
 
     def translateToDataRec(evt:EPCISEventType) : DataRecord[Any] = {
       evt match {
-        case e : ObjectEventType => DataRecord[ObjectEventType](e)
-        case e : AggregationEventType => DataRecord[AggregationEventType](e)
-        case e : TransactionEventType => DataRecord[TransactionEventType](e)
-        case e : QuantityEventType => DataRecord[QuantityEventType](e)
+        case e : ObjectEventType => DataRecord[ObjectEventType](None, Some("ObjectEvent"), e)
+        case e : AggregationEventType => DataRecord[AggregationEventType](None, Some("AggregationEvent"), e)
+        case e : TransactionEventType => DataRecord[TransactionEventType](None, Some("TransactionEvent"), e)
+        case e : QuantityEventType => DataRecord[QuantityEventType](None, Some("QuantityEvent"), e)
       }
     }
 
